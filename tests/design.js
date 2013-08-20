@@ -67,17 +67,22 @@ exports['stream view does not match blank object'] = function(test) {
     map({});
 
     test.equals(emit.called, false);
+
+    map({
+        stream: 'x'
+    });
+
+    test.equals(emit.called, false);
     emit.restore();
     test.done();
 }
 
-exports['stream view matches object with type stream'] = function(test) {
+exports['stream view matches object with stream & seq_no'] = function(test) {
     var call,
         emit = sinon.stub(global, 'emit'),
         map = eval('(' + design.views.stream.map + ')');
 
     map({
-        type: 'stream',
         stream: 'x',
         seq_no: 12
     });
