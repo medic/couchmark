@@ -2,8 +2,7 @@ var _ = require('underscore'),
     follow = require('follow'),
     sinon = require('sinon'),
     cradle = require('cradle'),
-    changeling = require('../index'),
-    feedStub;
+    changeling = require('../index');
 
 exports['api is a function'] = function(test) {
     test.ok(_.isFunction(changeling));
@@ -204,14 +203,14 @@ exports['saveDesign gets the existing design doc, saves because different'] = fu
 
     get = sinon.stub(db, 'get').callsArgWithAsync(1, null, {});
     save = sinon.stub(db, 'save').callsArgWithAsync(2, null, {});
-    sinon.stub(changeling, 'compareDesigns').returns(true);
+    sinon.stub(changeling, 'equalDesigns').returns(false);
 
     changeling.saveDesign(db, function(err) {
         test.equals(err, null);
         test.ok(get.called);
         test.ok(save.called);
 
-        changeling.compareDesigns.restore();
+        changeling.equalDesigns.restore();
         test.done();
     });
 };
@@ -228,14 +227,14 @@ exports['saveDesign gets the existing design doc, does not save because same'] =
 
     get = sinon.stub(db, 'get').callsArgWithAsync(1, null, {});
     save = sinon.stub(db, 'save').callsArgWithAsync(2, null, {});
-    sinon.stub(changeling, 'compareDesigns').returns(false);
+    sinon.stub(changeling, 'equalDesigns').returns(true);
 
     changeling.saveDesign(db, function(err) {
         test.equals(err, null);
         test.ok(get.called);
         test.equals(save.called, false);
 
-        changeling.compareDesigns.restore();
+        changeling.equalDesigns.restore();
         test.done();
     });
 };

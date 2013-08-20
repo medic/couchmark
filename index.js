@@ -40,7 +40,10 @@ _.extend(module.exports, {
 
         return new cradle.Connection(parsedUrl.protocol + '//' + parsedUrl.hostname, parsedUrl.port, opts).database(dbName);
     },
-    compareDesigns: function(db, generated) {
+    equalDesigns: function(db, generated) {
+        var viewsA = _.result(db, 'views'),
+            viewsB = _.result(generated, 'views');;
+
         return true;
     },
     saveDesign: function(db, callback) {
@@ -52,10 +55,10 @@ _.extend(module.exports, {
                     callback(err);
                 }
             } else {
-                if (module.exports.compareDesigns(doc, design)) {
-                    db.save('_design/changeling', design, callback);
-                } else {
+                if (module.exports.equalDesigns(doc, design)) {
                     callback(null);
+                } else {
+                    db.save('_design/changeling', design, callback);
                 }
             }
         });
