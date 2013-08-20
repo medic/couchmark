@@ -21,5 +21,11 @@
   "gitHead": "6070a7e0a7bda9062a40909675bcdbe012ca07df",
   "bugs": {
     "url": "https://github.com/wombleton/changeling/issues"
+  },
+  "dependencies": {
+    "follow": "~0.9.0"
+  },
+  "devDependencies": {
+    "nodeunit": "~0.8.1"
   }
 }
