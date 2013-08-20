@@ -1,0 +1,25 @@
+{
+  "name": "changeling",
+  "version": "0.0.1",
+  "description": "Wraps couchdb's `follow` to restart at the latest unhandled change.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/nodeunit/bin/nodeunit tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wombleton/changeling.git"
+  },
+  "keywords": [
+    "follow",
+    "changes",
+    "couchdb"
+  ],
+  "author": "Rowan Crawford (wombleton@gmail.com)",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "6070a7e0a7bda9062a40909675bcdbe012ca07df",
+  "bugs": {
+    "url": "https://github.com/wombleton/changeling/issues"
+  }
+}
