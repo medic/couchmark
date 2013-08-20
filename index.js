@@ -41,10 +41,10 @@ _.extend(module.exports, {
         return new cradle.Connection(parsedUrl.protocol + '//' + parsedUrl.hostname, parsedUrl.port, opts).database(dbName);
     },
     equalDesigns: function(db, generated) {
-        var viewsA = _.result(db, 'views'),
-            viewsB = _.result(generated, 'views');;
+        var a = _.result(db, 'views'),
+            b = _.result(generated, 'views');
 
-        return true;
+        return _.isEqual(a, b);
     },
     saveDesign: function(db, callback) {
         db.get('_design/changeling', function(err, doc) {
