@@ -23,9 +23,12 @@
     "url": "https://github.com/wombleton/changeling/issues"
   },
   "dependencies": {
-    "follow": "~0.9.0"
+    "follow": "~0.9.0",
+    "cradle": "~0.6.6",
+    "underscore": "~1.5.1"
   },
   "devDependencies": {
-    "nodeunit": "~0.8.1"
+    "nodeunit": "~0.8.1",
+    "sinon": "~1.7.3"
   }
 }
