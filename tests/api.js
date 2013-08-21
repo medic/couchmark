@@ -2,16 +2,16 @@ var _ = require('underscore'),
     follow = require('follow'),
     sinon = require('sinon'),
     cradle = require('cradle'),
-    changeling = require('../index');
+    couchmark = require('../index');
 
 exports['api is a function'] = function(test) {
-    test.ok(_.isFunction(changeling));
-    test.equals(changeling.length, 2);
+    test.ok(_.isFunction(couchmark));
+    test.equals(couchmark.length, 2);
     test.done();
 };
 
 exports["returns follow's Feed object"] = function(test) {
-    var feed = changeling({
+    var feed = couchmark({
         db: 'http://localhost:5984'
     }, function() {});
 
@@ -21,7 +21,7 @@ exports["returns follow's Feed object"] = function(test) {
     test.done();
 };
 
-exports['establishes cradle connection to changeling db'] = function(test) {
+exports['establishes cradle connection to couchmark db'] = function(test) {
     var call,
         cradleConn,
         databaseFn,
@@ -33,9 +33,9 @@ exports['establishes cradle connection to changeling db'] = function(test) {
     databaseFn = sinon.stub(cradleConn, 'database').returns({});
     conn = sinon.stub(cradle, 'Connection').returns(cradleConn);
 
-    changeling.getChangelingDb({
+    couchmark.getCouchmarkDb({
         db: 'http://admin:admin@localhost:1234/wumpus',
-        changelingDb: 'what'
+        couchmarkDb: 'what'
     });
 
     test.ok(conn.called);
@@ -69,11 +69,11 @@ exports['calls create, saveDesign if exists is false'] = function(test) {
     create = sinon.stub(db, 'create').callsArgWithAsync(0, null);
     exists = sinon.stub(db, 'exists').callsArgWithAsync(0, null, false);
 
-    saveDesign = sinon.stub(changeling, 'saveDesign').callsArgWithAsync(1, null);
+    saveDesign = sinon.stub(couchmark, 'saveDesign').callsArgWithAsync(1, null);
 
-    test.ok(_.isFunction(changeling.initializeChangelingDb));
+    test.ok(_.isFunction(couchmark.initializeCouchmarkDb));
 
-    changeling.initializeChangelingDb(db, function(err) {
+    couchmark.initializeCouchmarkDb(db, function(err) {
         test.equals(err, null);
         test.equals(exists.called, true);
         test.equals(create.called, true);
@@ -99,11 +99,11 @@ exports['does not call create, does call saveDesign if exists is true'] = functi
     create = sinon.stub(db, 'create').callsArgWithAsync(0, null);
     exists = sinon.stub(db, 'exists').callsArgWithAsync(0, null, true);
 
-    saveDesign = sinon.stub(changeling, 'saveDesign').callsArgWithAsync(1, null);
+    saveDesign = sinon.stub(couchmark, 'saveDesign').callsArgWithAsync(1, null);
 
-    test.ok(_.isFunction(changeling.initializeChangelingDb));
+    test.ok(_.isFunction(couchmark.initializeCouchmarkDb));
 
-    changeling.initializeChangelingDb(db, function(err) {
+    couchmark.initializeCouchmarkDb(db, function(err) {
         test.equals(err, null);
         test.equals(exists.called, true);
         test.equals(create.called, false);
@@ -130,7 +130,7 @@ exports['saveDesign gets the existing design doc, saves because not found'] = fu
     });
     save = sinon.stub(db, 'save').callsArgWithAsync(2, null, {});
 
-    changeling.saveDesign(db, function(err) {
+    couchmark.saveDesign(db, function(err) {
         test.equals(err, null);
         test.ok(get.called);
         test.ok(save.called);
@@ -151,14 +151,14 @@ exports['saveDesign gets the existing design doc, saves because different'] = fu
 
     get = sinon.stub(db, 'get').callsArgWithAsync(1, null, {});
     save = sinon.stub(db, 'save').callsArgWithAsync(2, null, {});
-    sinon.stub(changeling, 'equalDesigns').returns(false);
+    sinon.stub(couchmark, 'equalDesigns').returns(false);
 
-    changeling.saveDesign(db, function(err) {
+    couchmark.saveDesign(db, function(err) {
         test.equals(err, null);
         test.ok(get.called);
         test.ok(save.called);
 
-        changeling.equalDesigns.restore();
+        couchmark.equalDesigns.restore();
         test.done();
     });
 };
@@ -175,14 +175,14 @@ exports['saveDesign gets the existing design doc, does not save because same'] =
 
     get = sinon.stub(db, 'get').callsArgWithAsync(1, null, {});
     save = sinon.stub(db, 'save').callsArgWithAsync(2, null, {});
-    sinon.stub(changeling, 'equalDesigns').returns(true);
+    sinon.stub(couchmark, 'equalDesigns').returns(true);
 
-    changeling.saveDesign(db, function(err) {
+    couchmark.saveDesign(db, function(err) {
         test.equals(err, null);
         test.ok(get.called);
         test.equals(save.called, false);
 
-        changeling.equalDesigns.restore();
+        couchmark.equalDesigns.restore();
         test.done();
     });
 };

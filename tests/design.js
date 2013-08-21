@@ -1,7 +1,7 @@
 var _ = require('underscore'),
     follow = require('follow'),
     sinon = require('sinon'),
-    changeling = require('../index'),
+    couchmark = require('../index'),
     design = require('../design');
 
 _.defaults(global, {
@@ -9,13 +9,13 @@ _.defaults(global, {
 });
 
 exports['equalDesigns, returns true when views the same'] = function(test) {
-    test.ok(changeling.equalDesigns({
+    test.ok(couchmark.equalDesigns({
         views: {}
     }, {
         views: {}
     }));
 
-    test.ok(changeling.equalDesigns({
+    test.ok(couchmark.equalDesigns({
         views: {
             quack: {
                 map: 'function() {}'
@@ -33,7 +33,7 @@ exports['equalDesigns, returns true when views the same'] = function(test) {
 }
 
 exports['equalDesigns, returns false when different'] = function(test) {
-    test.equals(changeling.equalDesigns({
+    test.equals(couchmark.equalDesigns({
         views: {
             quack: {
                 map: 'function() {}'
@@ -46,7 +46,7 @@ exports['equalDesigns, returns false when different'] = function(test) {
             }
         }
     }), false);
-    test.equals(changeling.equalDesigns({}, {
+    test.equals(couchmark.equalDesigns({}, {
         views: {}
     }), false);
 

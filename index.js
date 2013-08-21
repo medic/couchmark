@@ -27,50 +27,70 @@ _.extend(module.exports, {
     Feed: function(options) {
         var db,
             feed,
-            opts = _.omit(options, 'stream', 'changelingDb'),
-            queue = async.queue(module.exports.updateSeq, 1);
+            opts = _.omit(options, 'stream', 'couchmark'),
+            stream = options.stream,
+            queue = async.queue(module.exports.updateSeq, 1),
+            ready = false,
+            parentFollow;
 
         feed = new follow.Feed(opts);
 
-        db = module.exports.getChangelingDb(options);
+        // wrap feed's follow to only trigger when ready
+        parentFollow = feed.follow;
 
-        module.exports.initializeChangelingDb(db, function() {
-            db.view('changeling/stream', {
+        feed.follow = function() {
+            if (ready) {
+                parentFollow.call(feed);
+            } else {
+                feed.once('ready', function() {
+                    parentFollow.call(feed);
+                });
+            }
+        }
+
+        db = module.exports.getCouchmarkDb(options);
+
+        module.exports.initializeCouchmarkDb(db, function() {
+            db.view('couchmark/stream', {
                 descending: true,
                 limit: 1,
-                startkey: [ opts.stream, {} ]
-            }, function(err, result) {
+                startkey: [ stream, {} ]
+            }, function(err, rows) {
                 var since,
                     latest;
 
                 if (!err) { // if error, start from 0
-                    latest = _.first(result.rows);
+                    latest = _.first(rows);
                     since = latest && latest.value;
                 }
 
                 if (since) {
                     feed.since = since;
                 }
+                ready = true;
+                feed.emit('ready');
             });
 
             feed.on('change', function(change) {
                 queue.push({
                     db: db,
-                    stream: opt.stream,
+                    stream: stream,
                     seq: change.seq
                 });
             });
         });
 
+
+
         return feed;
     },
-    getChangelingDb: function(options) {
+    getCouchmarkDb: function(options) {
         var parsedUrl = url.parse(options.db),
             auth = parsedUrl.auth,
             username,
             password,
             opts = {}
-            dbName = options.changelingDb || 'changeling';
+            dbName = options.couchmarkDb || 'couchmark';
 
         username = auth && auth.substring(0, auth.indexOf(':'));
         password = auth && auth.substring(auth.indexOf(':') + 1);
@@ -91,10 +111,10 @@ _.extend(module.exports, {
         return _.isEqual(a, b);
     },
     saveDesign: function(db, callback) {
-        db.get('_design/changeling', function(err, doc) {
+        db.get('_design/couchmark', function(err, doc) {
             if (err) {
                 if (err.error === 'not_found') {
-                    db.save('_design/changeling', design, callback);
+                    db.save('_design/couchmark', design, callback);
                 } else {
                     callback(err);
                 }
@@ -102,12 +122,12 @@ _.extend(module.exports, {
                 if (module.exports.equalDesigns(doc, design)) {
                     callback(null);
                 } else {
-                    db.save('_design/changeling', design, callback);
+                    db.save('_design/couchmark', design, callback);
                 }
             }
         });
     },
-    initializeChangelingDb: function(db, callback) {
+    initializeCouchmarkDb: function(db, callback) {
         db.exists(function(err, exists) {
             if (err) {
                 callback(err);

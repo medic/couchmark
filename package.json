@@ -1,5 +1,5 @@
 {
-  "name": "changeling",
+  "name": "couchmark",
   "version": "0.0.1",
   "description": "Wraps couchdb's `follow` to restart at the latest unhandled change.",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/wombleton/changeling.git"
+    "url": "git://github.com/wombleton/couchmark.git"
   },
   "keywords": [
     "follow",
@@ -20,7 +20,7 @@
   "readmeFilename": "README.md",
   "gitHead": "6070a7e0a7bda9062a40909675bcdbe012ca07df",
   "bugs": {
-    "url": "https://github.com/wombleton/changeling/issues"
+    "url": "https://github.com/wombleton/couchmark/issues"
   },
   "dependencies": {
     "follow": "~0.9.0",
