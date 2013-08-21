@@ -21,58 +21,6 @@ exports["returns follow's Feed object"] = function(test) {
     test.done();
 };
 
-exports['does not call follow on feed if immediate: false'] = function(test) {
-    var opts,
-        feed,
-        feedFn,
-        followFn;
-
-    feed = {
-        follow: function() {}
-    };
-
-    followFn = sinon.stub(feed, 'follow');
-
-    feedFn = sinon.stub(follow, 'Feed').returns(feed);
-
-    changeling({
-        db: 'http://localhost:5984',
-        immediate: false
-    }, function() {});
-    test.equals(followFn.called, false);
-
-    // immediate filtered from args to `follow`
-    opts = feedFn.getCall(0).args[0];
-    test.equals(opts.immediate, undefined);
-
-    feedFn.restore();
-
-    test.done();
-};
-
-exports['calls follow on feed if immediate: true'] = function(test) {
-    var feed,
-        followFn;
-
-    feed = {
-        follow: function() {}
-    };
-
-    followFn = sinon.stub(feed, 'follow');
-
-    sinon.stub(follow, 'Feed').returns(feed);
-
-    changeling({
-        db: 'http://localhost:5984',
-        immediate: true
-    }, function() {});
-    test.equals(followFn.called, true);
-
-    follow.Feed.restore();
-
-    test.done();
-};
-
 exports['establishes cradle connection to changeling db'] = function(test) {
     var call,
         cradleConn,
@@ -81,11 +29,11 @@ exports['establishes cradle connection to changeling db'] = function(test) {
 
     cradleConn = {
         database: function() {}
-    };
+    }
     databaseFn = sinon.stub(cradleConn, 'database').returns({});
     conn = sinon.stub(cradle, 'Connection').returns(cradleConn);
 
-    changeling({
+    changeling.getChangelingDb({
         db: 'http://admin:admin@localhost:1234/wumpus',
         changelingDb: 'what'
     });

@@ -1,25 +1,69 @@
 var _ = require('underscore'),
+    async = require('async'),
     cradle = require('cradle'),
     follow = require('follow'),
     url = require('url'),
     design = require('./design');
 
 module.exports = function(options, callback) {
-    var db,
-        feed,
-        opts = _.omit(options, 'immediate', 'changelingDb');
+    var feed = new module.exports.Feed(options);
 
-    feed = new follow.Feed(opts);
+    feed.on('error', function(err) {
+        callback.call(feed, err);
+    });
+    feed.on('change', function(change) {
+        callback.call(feed, null, change);
+    });
 
-    db = module.exports.getChangelingDb(options);
-
-    if (options.immediate) {
+    // Give the caller a chance to hook into any events.
+    process.nextTick(function() {
         feed.follow();
-    }
+    });
+
     return feed;
 };
 
 _.extend(module.exports, {
+    Feed: function(options) {
+        var db,
+            feed,
+            opts = _.omit(options, 'stream', 'changelingDb'),
+            queue = async.queue(module.exports.updateSeq, 1);
+
+        feed = new follow.Feed(opts);
+
+        db = module.exports.getChangelingDb(options);
+
+        module.exports.initializeChangelingDb(db, function() {
+            db.view('changeling/stream', {
+                descending: true,
+                limit: 1,
+                startkey: [ opts.stream, {} ]
+            }, function(err, result) {
+                var since,
+                    latest;
+
+                if (!err) { // if error, start from 0
+                    latest = _.first(result.rows);
+                    since = latest && latest.value;
+                }
+
+                if (since) {
+                    feed.since = since;
+                }
+            });
+
+            feed.on('change', function(change) {
+                queue.push({
+                    db: db,
+                    stream: opt.stream,
+                    seq: change.seq
+                });
+            });
+        });
+
+        return feed;
+    },
     getChangelingDb: function(options) {
         var parsedUrl = url.parse(options.db),
             auth = parsedUrl.auth,
@@ -78,6 +122,14 @@ _.extend(module.exports, {
                     }
                 });
             }
+        });
+    },
+    updateSeq: function(change, callback) {
+        change.db.save({
+            stream: change.stream,
+            seq_no: change.seq
+        }, function(err) {
+            callback(); // "optimistic"; ignores errors
         });
     }
 });

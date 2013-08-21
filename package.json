@@ -25,7 +25,8 @@
   "dependencies": {
     "follow": "~0.9.0",
     "cradle": "~0.6.6",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.1",
+    "async": "~0.2.9"
   },
   "devDependencies": {
     "nodeunit": "~0.8.1",
