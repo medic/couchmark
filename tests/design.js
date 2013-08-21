@@ -92,7 +92,7 @@ exports['stream view matches object with stream & seq_no'] = function(test) {
     call = emit.getCall(0);
 
     test.same(call.args[0], ['x', 12]);
-    test.same(call.args[1], null);
+    test.same(call.args[1], 12);
 
     emit.restore();
     test.done();
