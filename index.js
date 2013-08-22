@@ -26,6 +26,7 @@ module.exports = function(options, callback) {
 _.extend(module.exports, {
     Feed: function(options) {
         var db,
+            forDb = module.exports.forDb(options),
             feed,
             opts = _.omit(options, 'stream', 'couchmark'),
             stream = options.stream,
@@ -54,7 +55,7 @@ _.extend(module.exports, {
             db.view('couchmark/stream', {
                 descending: true,
                 limit: 1,
-                startkey: [ stream, {} ]
+                startkey: [ forDb, stream, {} ]
             }, function(err, rows) {
                 var since,
                     latest;
@@ -73,6 +74,7 @@ _.extend(module.exports, {
 
             feed.on('change', function(change) {
                 queue.push(_.extend({}, change, {
+                    forDb: forDb,
                     db: db,
                     stream: stream
                 }));
@@ -82,6 +84,11 @@ _.extend(module.exports, {
 
 
         return feed;
+    },
+    forDb: function(options) {
+        var parsedUrl = url.parse(options.db);
+
+        return parsedUrl.path.replace(/^\//, '');
     },
     getCouchmarkDb: function(options) {
         var parsedUrl = url.parse(options.db),
@@ -145,6 +152,7 @@ _.extend(module.exports, {
     },
     updateSeq: function(change, callback) {
         change.db.save({
+            forDb: change.forDb,
             id: change.id,
             changes: change.changes,
             stream: change.stream,
