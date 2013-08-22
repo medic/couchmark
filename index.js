@@ -72,11 +72,10 @@ _.extend(module.exports, {
             });
 
             feed.on('change', function(change) {
-                queue.push({
+                queue.push(_.extend({}, change, {
                     db: db,
-                    stream: stream,
-                    seq: change.seq
-                });
+                    stream: stream
+                }));
             });
         });
 
@@ -146,6 +145,8 @@ _.extend(module.exports, {
     },
     updateSeq: function(change, callback) {
         change.db.save({
+            id: change.id,
+            changes: change.changes,
             stream: change.stream,
             seq_no: change.seq
         }, function(err) {
