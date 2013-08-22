@@ -1,6 +1,6 @@
 {
   "name": "couchmark",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Wraps couchdb's `follow` to restart at the latest unhandled change.",
   "main": "index.js",
   "scripts": {
